@@ -1,0 +1,55 @@
+{
+  "seed": 42,
+  "species": ["LB01", "LB06", "LB07", "LB08", "LB09", "LB12", "LB18", "LB11", "LB02"],
+  "model": {
+    "hidden_dim": 384,
+    "projection_dim": 256,
+    "attention_dim": 128,
+    "transformer_layers": 2,
+    "transformer_heads": 4,
+    "transformer_ff_dim": 512,
+    "max_chunks": 16,
+    "dropout": 0.15,
+    "aggregation": "transformer"
+  },
+  "training": {
+    "epochs": 12,
+    "batch_size": 4,
+    "eval_batch_size": 6,
+    "chunk_microbatch": 8,
+    "backbone_learning_rate": 0.00001,
+    "head_learning_rate": 0.0002,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.03,
+    "patience": 4,
+    "gradient_clip": 2.0,
+    "num_workers": 0
+  },
+  "augmentation": {
+    "amplitude_jitter": 0.02,
+    "offset_jitter": 0.02,
+    "gaussian_noise_std": 0.01,
+    "time_mask_points": 200,
+    "time_mask_probability": 0.2
+  },
+  "objectives": {
+    "temperature": 0.05,
+    "supcon_weight": 0.5,
+    "mixup_alpha": 1.0,
+    "mixup_weight": 0.5,
+    "ce_weight": 0.5,
+    "mimix_weight": 1.0,
+    "curriculum_warmup_epochs": 4,
+    "hard_negative_weight": 1.5,
+    "cross_file_supcon_weight": 0.3,
+    "group_dro_weight": 0.5,
+    "group_dro_step_size": 0.01
+  },
+  "gates": {
+    "minimum_stone_reproduction_val_macro_f1": 0.78,
+    "minimum_objective_gain": 0.01,
+    "softcopyright_update_test_macro_f1": 0.82,
+    "minimum_crossfile_val_macro_f1_gain": 0.015,
+    "minimum_crossfile_p10_group_accuracy_gain": 0.03
+  }
+}

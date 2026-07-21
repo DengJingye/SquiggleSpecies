@@ -1,0 +1,26 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+dist/
+build/
+*.egg-info/
+
+# Experiment outputs. Keep manifests and summaries, not large caches/checkpoints.
+artifacts/runs/
+artifacts/teacher/
+logs/*.log
+*.pth
+*.npy
+*.npz
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+output/
+*.pth
+*.pt
+*.tar
+*.npy
+*.npz

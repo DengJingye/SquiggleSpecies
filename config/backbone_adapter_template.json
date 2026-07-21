@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "adapter": "your_package.your_adapter:create_backbone",
+  "kwargs": {
+    "model_path": "/path/to/model"
+  },
+  "preprocessing_profile": "your-versioned-profile-id",
+  "adaptation": {
+    "mode": "partial_finetune",
+    "selection": {
+      "unfreeze_last_n": 2
+    }
+  },
+  "notes": "The adapter, not the toolkit, defines what one trainable unit means and which preprocessing profiles are valid."
+}

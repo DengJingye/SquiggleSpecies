@@ -1,0 +1,25 @@
+{
+  "profile_id": "apple-sclamp-v1",
+  "implementation": "squiggle_species.preprocessing:apple_sclamp_v1",
+  "physical_signal_restore": "ccf_aux_v1",
+  "standardization": {
+    "valid_physical_range": [1.0, 220.0],
+    "spike_filter_window": 6000,
+    "spike_mad_threshold": 5.0,
+    "center": "global_median",
+    "scale": "1.4826_x_central_98_percent_mad",
+    "median_filter_kernel": 5,
+    "smooth_clamp": {
+      "linear_bound": 5.0,
+      "target_bound": 6.0
+    }
+  },
+  "discard_first": 5000,
+  "chunk_size": 6000,
+  "overlap": 3000,
+  "cache_dtype": "float16",
+  "compatible_model_families": [
+    "future-foundation-model-adapter"
+  ],
+  "warning": "This profile is not compatible with the current Zymo9 Bonito PFT Stone checkpoint."
+}

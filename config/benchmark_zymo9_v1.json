@@ -1,0 +1,28 @@
+{
+  "benchmark_id": "zymo9-file-heldout-v1",
+  "species": ["LB01", "LB06", "LB07", "LB08", "LB09", "LB12", "LB18", "LB11", "LB02"],
+  "split_unit": "ccf_file",
+  "seed": 42,
+  "tiers": {
+    "fixture": {
+      "purpose": "installation and end-to-end smoke only",
+      "reads_per_species": {"train": 2, "val": 2, "test": 2},
+      "max_chunks_per_read": 16
+    },
+    "benchmark_mini": {
+      "purpose": "fast reproducible comparison and figure generation",
+      "reads_per_species": {"train": 300, "val": 100, "test": 100},
+      "max_chunks_per_read": 16
+    },
+    "benchmark_full": {
+      "purpose": "formal internal file-held-out evaluation",
+      "reads_per_species": {"train": 1800, "val": 600, "test": 600},
+      "max_chunks_per_read": 16
+    }
+  },
+  "external_benchmark": {
+    "name": "D6306-Zymo10",
+    "role": "frozen external known-9 generalization and unseen-species rejection",
+    "prohibited_uses": ["training", "threshold_calibration", "atlas_construction"]
+  }
+}

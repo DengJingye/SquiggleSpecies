@@ -1,0 +1,49 @@
+{
+  "seed": 42,
+  "species": ["LB01", "LB06", "LB07", "LB08", "LB09", "LB12", "LB18", "LB11", "LB02"],
+  "signal": {
+    "strategy": "apple",
+    "discard_first": 5000,
+    "chunk_size": 6000,
+    "overlap": 3000,
+    "encoder_layers": 9,
+    "feature_dim": 768
+  },
+  "model": {
+    "hidden_dim": 384,
+    "projection_dim": 256,
+    "attention_dim": 128,
+    "transformer_layers": 2,
+    "transformer_heads": 4,
+    "transformer_ff_dim": 512,
+    "max_chunks": 8,
+    "dropout": 0.15
+  },
+  "training": {
+    "epochs": 15,
+    "batch_size": 4,
+    "eval_batch_size": 6,
+    "chunk_microbatch": 16,
+    "backbone_learning_rate": 0.00001,
+    "head_learning_rate": 0.0002,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.03,
+    "consistency_weight": 0.2,
+    "patience": 4,
+    "gradient_clip": 2.0,
+    "num_workers": 0
+  },
+  "augmentation": {
+    "amplitude_jitter": 0.03,
+    "offset_jitter": 0.03,
+    "gaussian_noise_std": 0.02,
+    "time_mask_points": 300,
+    "time_mask_probability": 0.3
+  },
+  "gates": {
+    "minimum_val_macro_f1_for_scaleup": 0.88,
+    "minimum_val_gain_for_scaleup": 0.03,
+    "stop_val_macro_f1": 0.86,
+    "stop_gain": 0.02
+  }
+}

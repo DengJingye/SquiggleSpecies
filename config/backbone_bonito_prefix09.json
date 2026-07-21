@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "adapter": "bonito-prefix-0-9",
+  "kwargs": {
+    "model_dir": "/path/to/bonito/model",
+    "device": "cuda:0",
+    "prefix_layers": 9,
+    "recurrent_start": 4,
+    "feature_dim": 768,
+    "chunk_microbatch": 64,
+    "preprocessing_profiles": [
+      "legacy-stone-v1",
+      "apple-sclamp-v1"
+    ]
+  },
+  "preprocessing_profile": "legacy-stone-v1",
+  "adaptation": {
+    "mode": "partial_finetune",
+    "selection": {
+      "unfreeze_last_n": 3
+    }
+  },
+  "validation_note": "PFT last-3 was selected only for the current Bonito weights plus legacy-stone-v1."
+}

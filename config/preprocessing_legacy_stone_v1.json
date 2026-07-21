@@ -1,0 +1,18 @@
+{
+  "profile_id": "legacy-stone-v1",
+  "implementation": "squiggle_species.preprocessing:legacy_stone_v1",
+  "physical_signal_restore": "ccf_aux_v1",
+  "standardization": {
+    "center": "global_median",
+    "scale": "1.4826_x_global_mad",
+    "minimum_scale": 1.0,
+    "smooth_clamp": null
+  },
+  "discard_first": 5000,
+  "chunk_size": 6000,
+  "overlap": 3000,
+  "cache_dtype": "float16",
+  "compatible_model_families": [
+    "zymo9-bonito-pft-stone-v3"
+  ]
+}

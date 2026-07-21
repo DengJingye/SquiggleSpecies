@@ -1,0 +1,15 @@
+{
+  "legacy_project": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616",
+  "legacy_split_manifest": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/06_signal_classifier/signal_classifier_zymo9_mlp_seed42/split_manifest.csv",
+  "legacy_v10_bag_manifest": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/15_signal_mimix_finetune/signal_transformer_mil_zymo9_mimix_ce_chunks64_seed42/bag_manifest.csv",
+  "bonito_chunk_cache": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/Data_Embeddings/bonito_chunk_cache_zymo9_selected_100k",
+  "bonito_read_cache": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/Data_Embeddings/bonito_768d_zymo9_selected_100k",
+  "sequence_kmer_cache": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/11_sequence_baseline/sequence_kmer_cache_k6",
+  "sequence_teacher_checkpoint": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/11_sequence_baseline/sequence_kmer_learned/kmer_mlp_contrastive_seed42/model.pth",
+  "sequence_teacher_metrics": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/11_sequence_baseline/sequence_kmer_learned/kmer_mlp_contrastive_seed42/metrics.json",
+  "signal_v10_checkpoint": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/15_signal_mimix_finetune/signal_transformer_mil_zymo9_mimix_ce_chunks64_seed42/model.pth",
+  "signal_v10_metrics": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/15_signal_mimix_finetune/signal_transformer_mil_zymo9_mimix_ce_chunks64_seed42/eval_signal_transformer_mil_zymo9/metrics.json",
+  "external_v28_summary": "/home/dengjingye/zymo9_realmix10_v28_mapping/06_external_evaluation/external_evaluation_summary.json",
+  "selected_reads_manifest": "/mnt/zzbnew/rnamodel/dengjingye/bacteria/zymo_10_0616/zymo9_work/selected_reads/selected_reads_manifest.csv"
+}
+

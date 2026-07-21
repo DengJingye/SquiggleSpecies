@@ -1,0 +1,10 @@
+read_id,true_label,predicted_label,confidence
+read_001,0,0,0.96
+read_002,1,1,0.92
+read_003,2,2,0.89
+read_004,3,4,0.42
+read_005,4,4,0.87
+read_006,5,5,0.91
+read_007,6,6,0.94
+read_008,7,7,0.90
+read_009,8,8,0.93

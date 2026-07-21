@@ -1,0 +1,45 @@
+{
+  "seed": 42,
+  "species": ["LB01", "LB06", "LB07", "LB08", "LB09", "LB12", "LB18", "LB11", "LB02"],
+  "model": {
+    "hidden_dim": 384,
+    "projection_dim": 256,
+    "attention_dim": 128,
+    "transformer_layers": 2,
+    "transformer_heads": 4,
+    "transformer_ff_dim": 512,
+    "max_chunks": 2,
+    "dropout": 0.15,
+    "aggregation": "transformer"
+  },
+  "training": {
+    "epochs": 2,
+    "batch_size": 2,
+    "eval_batch_size": 2,
+    "chunk_microbatch": 4,
+    "backbone_learning_rate": 0.00001,
+    "head_learning_rate": 0.0002,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.03,
+    "patience": 2,
+    "gradient_clip": 2.0,
+    "num_workers": 0
+  },
+  "augmentation": {
+    "amplitude_jitter": 0.01,
+    "offset_jitter": 0.01,
+    "gaussian_noise_std": 0.005,
+    "time_mask_points": 50,
+    "time_mask_probability": 0.1
+  },
+  "objectives": {
+    "temperature": 0.05,
+    "supcon_weight": 0.5,
+    "mixup_alpha": 1.0,
+    "mixup_weight": 0.5,
+    "ce_weight": 0.5,
+    "mimix_weight": 1.0,
+    "curriculum_warmup_epochs": 1,
+    "hard_negative_weight": 1.5
+  }
+}

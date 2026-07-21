@@ -1,0 +1,4 @@
+read_id,split,barcode,label,ccf_file
+read_001,train,LB01,0,LB01_train.ccf5
+read_002,val,LB01,0,LB01_val.ccf5
+read_003,test,LB01,0,LB01_test.ccf5

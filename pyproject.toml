@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "squiggle-species"
+version = "1.0.0"
+description = "Nanopore raw-signal microbial classification and evaluation toolkit"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "matplotlib>=3.6",
+  "numpy>=1.23",
+  "scipy>=1.9",
+  "scikit-learn>=1.1",
+  "torch>=2.0",
+]
+
+[project.scripts]
+squiggle-species = "squiggle_species.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.unittest]
+start-directory = "tests"

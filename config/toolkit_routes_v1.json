@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0",
+  "principle": "Preprocessing, backbone, adaptation, aggregation and objective are independent configured modules; a checkpoint must declare the compatible combination. Bonito PFT-3 is one validated profile, not a global rule.",
+  "selectable_modules": {
+    "preprocessing_profile": ["legacy-stone-v1", "apple-sclamp-v1"],
+    "backbone": {
+      "built_in_or_validated": ["bonito-prefix-0-9", "foundation-model-adapter"],
+      "external_extension": "Any SignalBackboneAdapter factory addressed as package.module:factory"
+    },
+    "backbone_adaptation": {
+      "modes": ["frozen", "partial_finetune"],
+      "selection": ["adapter-specific unfreeze_last_n", "adapter-specific named trainable_units"],
+      "rule": "Each backbone declares its own ordered adaptation units; last-3 is validated only for the current Bonito prefix."
+    },
+    "read_aggregation": ["mean", "gated-attention", "transformer-mil"],
+    "training_objective": ["ce", "supervised-contrastive", "embedding-mixup", "c2lr-random-layer-mimix"],
+    "decision_head": ["classifier", "optional-atlas-knn"]
+  },
+  "adapter_contract": {
+    "python_base_class": "squiggle_species.backbones.SignalBackboneAdapter",
+    "config_template": "config/backbone_adapter_template.json",
+    "required_metadata": ["backbone_id", "feature_dim", "preprocessing_profiles", "trainable_units"],
+    "required_method": "encode_chunks([n_chunks, signal_length]) -> [n_chunks, feature_dim]"
+  },
+  "validated_profiles": {
+    "bonito_stone_fast": {
+      "status": "validated-lightweight-baseline",
+      "preprocessing_profile": "legacy-stone-v1",
+      "backbone": "bonito-prefix-0-9",
+      "backbone_adaptation": "frozen",
+      "read_aggregation": "transformer-mil",
+      "training_objective": "ce",
+      "decision_head": "classifier",
+      "file_heldout_test_macro_f1": 0.8179
+    },
+    "bonito_stone_pft_ce": {
+      "status": "validated-ablation",
+      "preprocessing_profile": "legacy-stone-v1",
+      "backbone": "bonito-prefix-0-9",
+      "backbone_adaptation": "partial-finetune-last-3",
+      "read_aggregation": "transformer-mil",
+      "training_objective": "ce",
+      "decision_head": "classifier",
+      "file_heldout_val_macro_f1": 0.84797
+    },
+    "bonito_stone_best_current": {
+      "status": "current-default-pending-v4-closure",
+      "preprocessing_profile": "legacy-stone-v1",
+      "backbone": "bonito-prefix-0-9",
+      "backbone_adaptation": "partial-finetune-last-3",
+      "read_aggregation": "transformer-mil",
+      "training_objective": "c2lr-random-layer-mimix",
+      "decision_head": "classifier",
+      "file_heldout_val_macro_f1": 0.85332,
+      "file_heldout_test_macro_f1": 0.84521
+    },
+    "foundation_apple_experimental": {
+      "status": "experimental-not-release-default",
+      "preprocessing_profile": "apple-sclamp-v1",
+      "backbone": "foundation-model-adapter",
+      "backbone_adaptation": "checkpoint-specific",
+      "read_aggregation": "configurable",
+      "training_objective": "configurable",
+      "decision_head": "classifier"
+    },
+    "sequence_k6_reference": {
+      "status": "accuracy-reference-not-signal-inference",
+      "preprocessing_profile": "canonical-k6-sequence",
+      "backbone": "kmer-teacher",
+      "read_aggregation": "read-level-mlp",
+      "training_objective": "supervised-learning",
+      "decision_head": "classifier",
+      "file_heldout_test_macro_f1": 0.9822
+    }
+  },
+  "atlas_policy": {
+    "default_closed_set": false,
+    "allowed_roles": ["retrieval", "few-shot", "prototype-distance", "ood-diagnostics"]
+  }
+}
