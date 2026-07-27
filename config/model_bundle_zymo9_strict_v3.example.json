@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "bundle_id": "zymo9-strict-v3-seed42",
+  "model_family": "bonito_pft",
+  "class_names": ["LB01", "LB06", "LB07", "LB08", "LB09", "LB12", "LB18", "LB11", "LB02"],
+  "checkpoint": {
+    "path": "model.pth",
+    "sha256": "cd5df30ad62bc957268cbc7c53ea151d4cc60a6b8d558ef9d986c7fafc278358"
+  },
+  "backbone": {
+    "adapter": "bonito-prefix-0-9",
+    "weights": {
+      "filename": "weights_0.tar",
+      "sha256": "84502de9948fdfdce93b30df5b5460df17f7e438d9c1b2d41dcb8ab62a0fe30d"
+    }
+  },
+  "adaptation": {
+    "mode": "partial_finetune",
+    "unfreeze_last_n": 3
+  },
+  "preprocessing": {
+    "profile_id": "legacy-stone-v1",
+    "physical_signal_restoration": true
+  },
+  "chunking": {
+    "discard_first": 5000,
+    "chunk_size": 6000,
+    "overlap": 3000,
+    "max_chunks": 16,
+    "evaluation_sampling": "uniform"
+  },
+  "runtime": {
+    "eval_batch_size": 6,
+    "chunk_microbatch": 8
+  },
+  "calibration": {
+    "selected_on": "validation",
+    "selection_rule": "maximum coverage subject to accepted accuracy >= 0.90, overall coverage >= 0.50, per-class coverage >= 0.50 and accuracy gain >= 0.01",
+    "threshold_enabled": true,
+    "threshold": 0.711796760559082,
+    "validation_accepted_accuracy": 0.9000624609618988,
+    "validation_coverage": 0.8894444444444445
+  },
+  "evaluation_scope": {
+    "primary_protocol": "CCF-file-held-out Zymo9",
+    "test_macro_f1": 0.8452099948454717,
+    "warning": "Do not describe this model as a sequence replacement or as an external-batch result."
+  }
+}

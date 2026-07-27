@@ -14,6 +14,8 @@ HELP = """Squiggle Species command line interface.
 
 Common workflows:
   squiggle-species inventory-ccf /data/signals -o inventory.json
+  squiggle-species cache-ccf /data/signals --profile legacy-stone-v1 --output-dir raw_cache
+  squiggle-species classify-ccf /data/signals --model-bundle model_bundle.json --bonito-model-dir models --output-dir results --device cuda:0
   squiggle-species validate-manifest split_manifest.csv -o audit.json
   squiggle-species predict --manifest bag_manifest.csv --checkpoint model.pth --config experiment.json --output predictions.csv
   squiggle-species predict-raw-cache --manifest raw_manifest.csv --checkpoint model.pth --bonito-model-dir models --output predictions.csv
@@ -38,6 +40,47 @@ def build_parser() -> argparse.ArgumentParser:
     inventory_parser = subparsers.add_parser("inventory-ccf", help="Inventory CCF5/BLOW5/SLOW5 input files.")
     inventory_parser.add_argument("input", type=Path)
     inventory_parser.add_argument("-o", "--output", type=Path)
+
+    cache_parser = subparsers.add_parser(
+        "cache-ccf",
+        help="Build a resumable standardized raw-chunk cache from CCF5 files.",
+    )
+    cache_parser.add_argument("input", type=Path)
+    cache_parser.add_argument("--output-dir", type=Path, required=True)
+    cache_parser.add_argument(
+        "--profile",
+        choices=["legacy-stone-v1", "apple-sclamp-v1"],
+        required=True,
+    )
+    cache_parser.add_argument("--discard-first", type=int, default=5000)
+    cache_parser.add_argument("--chunk-size", type=int, default=6000)
+    cache_parser.add_argument("--overlap", type=int, default=3000)
+    cache_parser.add_argument("--reads-per-part", type=int, default=1000)
+    cache_parser.add_argument("--max-reads", type=int, default=0)
+
+    classify_parser = subparsers.add_parser(
+        "classify-ccf",
+        help="Stream CCF5 reads through a frozen model bundle and build a report.",
+    )
+    classify_parser.add_argument("input", type=Path)
+    classify_parser.add_argument("--model-bundle", type=Path, required=True)
+    classify_parser.add_argument("--bonito-model-dir", type=Path, required=True)
+    classify_parser.add_argument("--output-dir", type=Path, required=True)
+    classify_parser.add_argument("--device", default="cpu")
+    classify_parser.add_argument("--batch-size", type=int)
+    classify_parser.add_argument("--max-reads", type=int, default=0)
+    classify_parser.add_argument(
+        "--skip-hash-verification",
+        action="store_true",
+        help="Development only; do not use for formal benchmark or external inference.",
+    )
+
+    bundle_parser = subparsers.add_parser(
+        "inspect-model-bundle",
+        help="Validate model metadata, preprocessing compatibility and file hashes.",
+    )
+    bundle_parser.add_argument("model_bundle", type=Path)
+    bundle_parser.add_argument("--bonito-model-dir", type=Path)
 
     manifest_parser = subparsers.add_parser("validate-manifest", help="Audit read and CCF-file split leakage.")
     manifest_parser.add_argument("manifest", type=Path)
@@ -105,6 +148,51 @@ def main(argv: Sequence[str] | None = None) -> int:
         result = inventory_ccf5(args.input)
         if args.output:
             save_json(args.output, result)
+    elif args.command == "cache-ccf":
+        from .ccf import cache_ccf5
+
+        result = cache_ccf5(
+            args.input,
+            args.output_dir,
+            profile_id=args.profile,
+            discard_first=args.discard_first,
+            chunk_size=args.chunk_size,
+            overlap=args.overlap,
+            reads_per_part=args.reads_per_part,
+            max_reads=args.max_reads,
+        )
+    elif args.command == "classify-ccf":
+        from .pipeline import classify_ccf5
+
+        result = classify_ccf5(
+            args.input,
+            args.model_bundle,
+            args.bonito_model_dir,
+            args.output_dir,
+            device=args.device,
+            batch_size=args.batch_size,
+            max_reads=args.max_reads,
+            verify_hashes=not args.skip_hash_verification,
+        )
+    elif args.command == "inspect-model-bundle":
+        from .model_bundle import load_model_bundle, verify_bonito_weights
+
+        bundle = load_model_bundle(args.model_bundle)
+        result = {
+            "status": "valid",
+            "schema_version": bundle["schema_version"],
+            "model_family": bundle["model_family"],
+            "class_names": bundle["class_names"],
+            "preprocessing": bundle["preprocessing"],
+            "chunking": bundle["chunking"],
+            "checkpoint": bundle["_checkpoint_path"],
+            "bundle_sha256": bundle["_bundle_sha256"],
+        }
+        if args.bonito_model_dir:
+            result["bonito_weights"] = verify_bonito_weights(
+                bundle,
+                args.bonito_model_dir,
+            )
     elif args.command == "validate-manifest":
         from .manifest import audit_manifest
 

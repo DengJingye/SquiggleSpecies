@@ -1,0 +1,25 @@
+{
+  "package_version": "results-v1.1",
+  "primary_protocol": "strict CCF-file-held-out Zymo9",
+  "primary_signal_result": {
+    "test_accuracy": 0.845925925925926,
+    "test_macro_f1": 0.8452099948454717,
+    "three_seed_macro_f1_mean": 0.845676010098845,
+    "three_seed_macro_f1_std_population": 0.0009191541374212311
+  },
+  "strict_coarse8_macro_f1": 0.8931516597180564,
+  "sequence_k6_teacher_test_macro_f1": 0.9822291908306252,
+  "lb01_lb12_binary_test_macro_f1": 0.6964769647696477,
+  "reference_diverse5": {
+    "species": ["LB06", "LB07", "LB02", "LB08", "LB11"],
+    "test_macro_f1_mean": 0.9280003812508096,
+    "test_macro_f1_std_population": 0.0033254734974212563,
+    "status": "auxiliary demonstration; does not replace strict Zymo9"
+  },
+  "legacy_external_d6306": {
+    "model_protocol": "historical random-read H-v10, not strict S-v3",
+    "known9_macro_f1": 0.7050877981347209,
+    "unknown10_abstain_rate": 0.5701657320664925,
+    "unknown10_false_accept_rate": 0.4298342679335075
+  }
+}

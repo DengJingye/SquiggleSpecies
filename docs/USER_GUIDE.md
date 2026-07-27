@@ -25,7 +25,40 @@ squiggle-species validate-manifest split_manifest.csv -o output/manifest_audit.j
 
 ## 4. 模型推理
 
-### 4.1 Frozen 768D开发基线
+### 4.1 CCF5端到端流式推理
+
+```bash
+PYTHONPATH=src /usr/bin/python3 -m squiggle_species classify-ccf \
+  /data/sample/signals \
+  --model-bundle /path/to/model_bundle.json \
+  --bonito-model-dir /path/to/bonito/models \
+  --device cuda:0 \
+  --output-dir output/sample_result
+```
+
+`model_bundle.json`固定类别顺序、checkpoint与Bonito权重哈希、标准化profile、chunk参数、MIL最大chunk数和validation校准阈值。程序在推理前强制校验这些接口，避免Stone模型误用Apple数据或类别顺序错位。
+
+该命令直接顺序读取CCF5，不依赖`.idx`。raw chunks只在内存batch中存在，推理后立即释放；程序按CCF文件原子写入预测并支持断点续跑。主要输出为：
+
+- `read_predictions.csv`：read级类别、置信度和各类别概率；
+- `report/species_abundance.csv/png`：accepted reads预测组成；
+- `report/confidence_distribution.png`：冻结阈值与置信度分布；
+- `classification_summary.json`：输入、模型、profile、覆盖和输出审计。
+
+单一运行环境必须同时包含`pyccf5`、`bonito`和CUDA PyTorch。当前服务器使用`/usr/bin/python3`已经完成真实CCF smoke。
+
+### 4.2 建立可复用raw cache
+
+```bash
+PYTHONPATH=src /usr/bin/python3 -m squiggle_species cache-ccf \
+  /data/sample/signals \
+  --profile legacy-stone-v1 \
+  --output-dir output/raw_cache
+```
+
+缓存以float16保存标准化后的6000点raw chunks，而不是把一个read的chunks先求均值。时间维均值发生在Bonito对单个chunk编码之后；MIL再聚合一个read包含的多个768D chunk向量。大型混样优先使用流式`classify-ccf`，避免raw cache占满磁盘。
+
+### 4.3 Frozen 768D开发基线
 
 ```bash
 squiggle-species predict \
@@ -39,7 +72,7 @@ squiggle-species predict \
 
 输入 manifest 的每一行代表一个 read bag，记录 chunk embedding 路径、chunk起点、chunk数量、物种标签和read_id。推理结果包含 predicted_label、confidence 和每个类别的概率。
 
-### 4.2 Bonito部分微调正式模型
+### 4.4 Bonito部分微调正式模型
 
 ```bash
 squiggle-species predict-raw-cache \

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "bundle_id": "replace-with-model-id",
+  "model_family": "bonito_pft",
+  "class_names": ["class_a", "class_b"],
+  "checkpoint": {
+    "path": "model.pth",
+    "sha256": "replace-with-checkpoint-sha256"
+  },
+  "backbone": {
+    "adapter": "bonito-prefix-0-9",
+    "weights": {
+      "filename": "weights_0.tar",
+      "sha256": "replace-with-bonito-weights-sha256"
+    }
+  },
+  "adaptation": {
+    "mode": "partial_finetune",
+    "unfreeze_last_n": 3
+  },
+  "preprocessing": {
+    "profile_id": "legacy-stone-v1",
+    "physical_signal_restoration": true
+  },
+  "chunking": {
+    "discard_first": 5000,
+    "chunk_size": 6000,
+    "overlap": 3000,
+    "max_chunks": 16,
+    "evaluation_sampling": "uniform"
+  },
+  "runtime": {
+    "eval_batch_size": 6,
+    "chunk_microbatch": 8
+  },
+  "calibration": {
+    "selected_on": "validation",
+    "threshold_enabled": false,
+    "threshold": 0.0
+  }
+}

@@ -1,0 +1,5 @@
+task_label,test_macro_f1,status
+Strict Zymo9 (9 classes),0.8452099948454717,primary
+Zymo8 group (LB01/LB12 merged),0.8931516597180564,secondary remap
+Hard-anchor 5-class,0.8279685814493771,historical diagnostic
+Reference-diverse 5-class,0.9280003812508096,auxiliary demonstration

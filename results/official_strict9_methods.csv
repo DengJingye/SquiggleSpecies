@@ -1,0 +1,6 @@
+route_id,short_name,modality,test_accuracy,test_macro_f1,interpretation
+sequence_teacher_k6,Sequence k=6 teacher,sequence,0.9822222222222222,0.9822291908306252,Sequence learnability reference; not a raw-signal method.
+signal_v1_frozen_ce,Signal frozen CE,signal,0.8083333333333333,0.8080291651834755,Strict CCF-file-held-out signal baseline.
+signal_v1_crossmodal_kd,Signal cross-modal KD,signal,0.8174074074074074,0.8166008179950113,Small positive result; did not meet scale-up gate.
+signal_v3_stone_frozen_transformer,Signal Stone frozen,signal,0.8185185185185185,0.8178943736734969,Fresh Stone frozen control.
+signal_v3_stone_pft3_c2lr_mimix,Signal Stone PFT-3,signal,0.845925925925926,0.8452099948454717,Official strict Zymo9 signal result.

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "squiggle-species"
-version = "1.0.0"
+version = "1.1.0"
 description = "Nanopore raw-signal microbial classification and evaluation toolkit"
 readme = "README.md"
 requires-python = ">=3.9"

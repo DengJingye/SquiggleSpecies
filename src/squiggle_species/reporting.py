@@ -35,9 +35,11 @@ def build_report(
     threshold: float = 0.0,
     threshold_enabled: bool | None = None,
     calibration: dict | None = None,
+    class_names: tuple[str, ...] | list[str] | None = None,
 ) -> dict:
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    class_names = tuple(class_names or SPECIES)
     confidence = np.asarray([float(row["confidence"]) for row in rows], dtype=np.float64)
     y_pred = np.asarray([int(row["predicted_label"]) for row in rows], dtype=np.int64)
     if threshold_enabled is None:
@@ -47,11 +49,11 @@ def build_report(
     abundance_rows = [
         {
             "label": label,
-            "species": SPECIES[label] if 0 <= label < len(SPECIES) else f"class_{label}",
+            "species": class_names[label] if 0 <= label < len(class_names) else f"class_{label}",
             "reads": abundance.get(label, 0),
             "fraction_of_accepted": abundance.get(label, 0) / max(1, int(accepted.sum())),
         }
-        for label in range(len(SPECIES))
+        for label in range(len(class_names))
     ]
     write_csv(output_dir / "species_abundance.csv", abundance_rows, list(abundance_rows[0]))
     summary = {
@@ -68,16 +70,24 @@ def build_report(
     has_truth = "true_label" in rows[0] and all(row.get("true_label", "") != "" for row in rows)
     if has_truth:
         y_true = np.asarray([int(row["true_label"]) for row in rows], dtype=np.int64)
-        full_metrics = classification_summary(y_true, y_pred, confidence)
+        full_metrics = classification_summary(y_true, y_pred, confidence, class_names)
         accepted_metrics = (
-            classification_summary(y_true[accepted], y_pred[accepted], confidence[accepted]) if accepted.any() else {}
+            classification_summary(y_true[accepted], y_pred[accepted], confidence[accepted], class_names)
+            if accepted.any()
+            else {}
         )
         summary["full_metrics"] = full_metrics
         summary["accepted_metrics"] = accepted_metrics
         if accepted_metrics:
             matrix = np.asarray(accepted_metrics["confusion_matrix"], dtype=np.int64)
             np.savetxt(output_dir / "confusion_matrix.csv", matrix, delimiter=",", fmt="%d")
-            per_species = _per_species_rows(y_true, accepted, full_metrics, accepted_metrics)
+            per_species = _per_species_rows(
+                y_true,
+                accepted,
+                full_metrics,
+                accepted_metrics,
+                class_names,
+            )
             write_csv(output_dir / "per_species_metrics.csv", per_species, list(per_species[0]))
             summary["per_species_acceptance"] = {
                 row["species"]: {
@@ -87,7 +97,7 @@ def build_report(
                 }
                 for row in per_species
             }
-            _plot_confusion(matrix, output_dir / "confusion_matrix.png")
+            _plot_confusion(matrix, class_names, output_dir / "confusion_matrix.png")
             _plot_per_species(per_species, output_dir / "per_species_metrics.png")
             correctness_auroc = None
             correct = y_true == y_pred
@@ -111,6 +121,18 @@ def build_report(
                 {"metric": "confidence_correctness_auroc", "value": correctness_auroc},
             ]
             write_csv(output_dir / "metrics_summary.csv", metric_rows, ["metric", "value"])
+    else:
+        _plot_abundance(
+            abundance_rows,
+            output_dir / "species_abundance.png",
+        )
+        _plot_unlabeled_confidence(
+            confidence,
+            accepted,
+            threshold,
+            bool(threshold_enabled),
+            output_dir / "confidence_distribution.png",
+        )
     save_json(output_dir / "report_summary.json", summary)
     return summary
 
@@ -120,9 +142,10 @@ def _per_species_rows(
     accepted: np.ndarray,
     full_metrics: dict,
     accepted_metrics: dict,
+    class_names: tuple[str, ...],
 ) -> list[dict]:
     rows = []
-    for label, species in enumerate(SPECIES):
+    for label, species in enumerate(class_names):
         total_reads = int(np.sum(y_true == label))
         accepted_reads = int(np.sum((y_true == label) & accepted))
         full = full_metrics["per_species"][species]
@@ -148,7 +171,7 @@ def _per_species_rows(
     return rows
 
 
-def _plot_confusion(matrix: np.ndarray, path: Path) -> None:
+def _plot_confusion(matrix: np.ndarray, class_names: tuple[str, ...], path: Path) -> None:
     os.environ.setdefault("MPLCONFIGDIR", str(Path(tempfile.gettempdir()) / "squiggle_species_mpl"))
     import matplotlib
 
@@ -157,8 +180,8 @@ def _plot_confusion(matrix: np.ndarray, path: Path) -> None:
 
     fig, ax = plt.subplots(figsize=(8, 7))
     image = ax.imshow(matrix, cmap="Blues")
-    ax.set_xticks(range(len(SPECIES)), SPECIES, rotation=45, ha="right")
-    ax.set_yticks(range(len(SPECIES)), SPECIES)
+    ax.set_xticks(range(len(class_names)), class_names, rotation=45, ha="right")
+    ax.set_yticks(range(len(class_names)), class_names)
     ax.set_xlabel("Predicted")
     ax.set_ylabel("Reference label")
     ax.set_title("Accepted read-level confusion matrix")
@@ -233,6 +256,69 @@ def _plot_confidence(
     ax.set_ylabel("Density")
     ax.set_title("Confidence distribution by prediction correctness")
     ax.legend(frameon=False)
+    ax.grid(alpha=0.2)
+    fig.tight_layout()
+    fig.savefig(path, dpi=220)
+    plt.close(fig)
+
+
+def _plot_abundance(rows: list[dict], path: Path) -> None:
+    import matplotlib.pyplot as plt
+
+    labels = [row["species"] for row in rows]
+    values = [row["fraction_of_accepted"] for row in rows]
+    fig, ax = plt.subplots(figsize=(9.2, 5.6))
+    bars = ax.bar(labels, values, color="#2A9D6F")
+    ax.set_ylim(0, max(1.0, max(values, default=0.0) * 1.15))
+    ax.set_ylabel("Fraction of accepted reads")
+    ax.set_title("Predicted species composition")
+    ax.tick_params(axis="x", rotation=35)
+    ax.grid(axis="y", alpha=0.25)
+    for bar, value in zip(bars, values):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            value + 0.015,
+            f"{value:.3f}",
+            ha="center",
+            fontsize=8,
+        )
+    fig.tight_layout()
+    fig.savefig(path, dpi=220)
+    plt.close(fig)
+
+
+def _plot_unlabeled_confidence(
+    confidence: np.ndarray,
+    accepted: np.ndarray,
+    threshold: float,
+    threshold_enabled: bool,
+    path: Path,
+) -> None:
+    import matplotlib.pyplot as plt
+
+    fig, ax = plt.subplots(figsize=(8.5, 5.6))
+    ax.hist(confidence, bins=np.linspace(0, 1, 31), color="#64748B", alpha=0.8)
+    if threshold_enabled:
+        ax.axvline(
+            threshold,
+            color="#C84A4A",
+            linestyle="--",
+            linewidth=2,
+            label=f"Frozen threshold={threshold:.3f}",
+        )
+        ax.legend(frameon=False)
+    ax.text(
+        0.02,
+        0.95,
+        f"Accepted: {accepted.mean():.1%}",
+        transform=ax.transAxes,
+        va="top",
+        bbox={"boxstyle": "round,pad=0.3", "facecolor": "white", "edgecolor": "#CBD5E1"},
+    )
+    ax.set_xlim(0, 1)
+    ax.set_xlabel("Prediction confidence")
+    ax.set_ylabel("Reads")
+    ax.set_title("Read-level confidence distribution")
     ax.grid(alpha=0.2)
     fig.tight_layout()
     fig.savefig(path, dpi=220)
